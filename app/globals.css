@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #09090b;
+  --primary: #18181b;
+  --secondary: #71717a;
+  --accent: #f4f4f5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #09090b;
+    /* Deep Zinc background */
+    --foreground: #fafafa;
+    --primary: #ffffff;
+    --secondary: #a1a1aa;
+    --accent: #18181b;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  * {
+    @apply border-neutral-200 dark:border-neutral-800;
+  }
+}
+
+/* Premium Motion & Interaction */
+.tap-target {
+  @apply active:scale-[0.97] transition-all duration-200 ease-out cursor-pointer;
+}
+
+.glass {
+  @apply bg-white/70 dark:bg-neutral-900/70 backdrop-blur-xl border border-white/20 dark:border-white/5;
+}
+
+/* Custom shadow that disappears in dark mode */
+.premium-shadow {
+  @apply shadow-[0_8px_30px_rgb(0, 0, 0, 0.04)] dark:shadow-none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth Scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom input focus states */
+input,
+select {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all;
+}
