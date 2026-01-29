@@ -11,7 +11,6 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #09090b;
-    /* Deep Zinc background */
     --foreground: #fafafa;
     --primary: #ffffff;
     --secondary: #a1a1aa;
@@ -27,24 +26,39 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-@layer base {
-  * {
-    @apply border-neutral-200 dark:border-neutral-800;
-  }
-}
-
 /* Premium Motion & Interaction */
 .tap-target {
-  @apply active:scale-[0.97] transition-all duration-200 ease-out cursor-pointer;
+  transition: all 0.2s ease-out;
+  cursor: pointer;
+}
+
+.tap-target:active {
+  transform: scale(0.97);
 }
 
 .glass {
-  @apply bg-white/70 dark:bg-neutral-900/70 backdrop-blur-xl border border-white/20 dark:border-white/5;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Custom shadow that disappears in dark mode */
+@media (prefers-color-scheme: dark) {
+  .glass {
+    background-color: rgba(9, 9, 11, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* Custom shadow */
 .premium-shadow {
-  @apply shadow-[0_8px_30px_rgb(0, 0, 0, 0.04)] dark:shadow-none;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  .premium-shadow {
+    box-shadow: none;
+  }
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -62,7 +76,21 @@ html {
 }
 
 /* Custom input focus states */
-input,
-select {
-  @apply focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all;
+input:focus,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+/* Base border override since we can't use @apply in @layer base easily in some v4 builds without issues */
+* {
+  border-color: #e5e7eb;
+  /* neutral-200 equivalent */
+}
+
+@media (prefers-color-scheme: dark) {
+  * {
+    border-color: #262626;
+    /* neutral-800 equivalent */
+  }
 }
