@@ -19,7 +19,18 @@ interface CreateRoutineModalProps {
     onClose: () => void;
     onSuccess: () => void;
     userId: string;
-    routineToEdit?: any;
+    routineToEdit?: {
+        id: string;
+        name: string;
+        routine_items: {
+            exercise_name: string;
+            series: number;
+            rir: number;
+            tempo: string;
+            method: string;
+            prescribed_reps: string;
+        }[];
+    } | null;
 }
 
 const METHODS = ['NORMAL', 'AMRAP', 'REST PAUSE', 'DROP SET'];
@@ -40,12 +51,25 @@ export default function CreateRoutineModal({ isOpen, onClose, onSuccess, userId,
         prescribed_reps: "10-12"
     });
 
+    const fetchLibrary = async () => {
+        const { data } = await supabase.from('exercise_library').select('name, category').order('category');
+        if (data) {
+            const grouped = data.reduce((acc: Record<string, string[]>, curr: { name: string; category: string }) => {
+                const cat = curr.category || 'Otros';
+                if (!acc[cat]) acc[cat] = [];
+                acc[cat].push(curr.name);
+                return acc;
+            }, {});
+            setGroupedLibrary(grouped);
+        }
+    };
+
     useEffect(() => {
         if (isOpen) {
             fetchLibrary();
             if (routineToEdit) {
                 setName(routineToEdit.name);
-                setAddedExercises(routineToEdit.routine_items.map((it: any) => ({
+                setAddedExercises(routineToEdit.routine_items.map((it: { exercise_name: string; series: number; rir: number; tempo: string; method: string; prescribed_reps: string }) => ({
                     name: it.exercise_name,
                     series: it.series,
                     rir: it.rir,
@@ -59,19 +83,6 @@ export default function CreateRoutineModal({ isOpen, onClose, onSuccess, userId,
             }
         }
     }, [isOpen, routineToEdit]);
-
-    const fetchLibrary = async () => {
-        const { data } = await supabase.from('exercise_library').select('name, category').order('category');
-        if (data) {
-            const grouped = data.reduce((acc: any, curr: any) => {
-                const cat = curr.category || 'Otros';
-                if (!acc[cat]) acc[cat] = [];
-                acc[cat].push(curr.name);
-                return acc;
-            }, {});
-            setGroupedLibrary(grouped);
-        }
-    };
 
     const handleAddOrUpdateExercise = () => {
         if (!currentExercise.name) return;
@@ -158,7 +169,7 @@ export default function CreateRoutineModal({ isOpen, onClose, onSuccess, userId,
                                     className="w-full h-14 px-6 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 font-bold text-sm"
                                 >
                                     <option value="">Seleccionar ejercicio...</option>
-                                    {Object.entries(groupedLibrary).map(([cat, exs]: any) => (
+                                    {Object.entries(groupedLibrary).map(([cat, exs]) => (
                                         <optgroup key={cat} label={cat.toUpperCase()}>
                                             {exs.map((ex: string) => <option key={ex} value={ex}>{ex}</option>)}
                                         </optgroup>

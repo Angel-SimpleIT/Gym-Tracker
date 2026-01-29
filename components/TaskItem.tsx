@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Dumbbell, ChevronDown, ChevronUp, TrendingUp, Clock, ShieldCheck, Trash2, Sliders, Copy } from "lucide-react";
+import { Check, Dumbbell, ChevronDown, ChevronUp, TrendingUp, ShieldCheck, Trash2, Sliders, Copy } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 

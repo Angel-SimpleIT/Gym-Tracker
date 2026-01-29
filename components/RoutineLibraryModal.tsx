@@ -2,16 +2,27 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Play, Trash2, Copy, Plus, ChevronRight, Dumbbell, Calendar as CalendarIcon, Edit3 } from "lucide-react";
+import { X, Play, Trash2, Copy, Plus, Edit3 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import CreateRoutineModal from "./CreateRoutineModal";
 
+interface RoutineItem {
+    id: string;
+    routine_id: string;
+    exercise_name: string;
+    series: number;
+    rir: number;
+    tempo: string;
+    method: string;
+    prescribed_reps: string;
+}
+
 interface Routine {
     id: string;
     name: string;
-    routine_items: any[];
+    routine_items: RoutineItem[];
 }
 
 interface RoutineLibraryModalProps {
@@ -26,13 +37,7 @@ export default function RoutineLibraryModal({ isOpen, onClose, userId, selectedD
     const [routines, setRoutines] = useState<Routine[]>([]);
     const [loading, setLoading] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [templateToEdit, setTemplateToEdit] = useState<any>(null);
-
-    useEffect(() => {
-        if (isOpen) {
-            fetchRoutines();
-        }
-    }, [isOpen]);
+    const [templateToEdit, setTemplateToEdit] = useState<Routine | null>(null);
 
     const fetchRoutines = async () => {
         setLoading(true);
@@ -47,6 +52,12 @@ export default function RoutineLibraryModal({ isOpen, onClose, userId, selectedD
         setLoading(false);
     };
 
+    useEffect(() => {
+        if (isOpen) {
+            fetchRoutines();
+        }
+    }, [isOpen]);
+
     const handleDelete = async (id: string) => {
         const { error } = await supabase.from('routines').delete().eq('id', id);
         if (!error) {
@@ -56,7 +67,7 @@ export default function RoutineLibraryModal({ isOpen, onClose, userId, selectedD
 
     const handleDuplicate = async (routine: Routine) => {
         setLoading(true);
-        const { data: newRoutine, error: routineError } = await supabase
+        const { data: newRoutine } = await supabase
             .from('routines')
             .insert([{ user_id: userId, name: `${routine.name} (Copia)` }])
             .select()
@@ -64,7 +75,7 @@ export default function RoutineLibraryModal({ isOpen, onClose, userId, selectedD
 
         if (newRoutine) {
             await supabase.from('routine_items').insert(
-                routine.routine_items.map((it: any, idx: number) => ({
+                routine.routine_items.map((it: RoutineItem, idx: number) => ({
                     routine_id: newRoutine.id,
                     exercise_name: it.exercise_name,
                     series: it.series,

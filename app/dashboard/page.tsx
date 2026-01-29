@@ -1,5 +1,7 @@
 "use client";
 
+import { User } from "@supabase/supabase-js";
+
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import TaskItem from "@/components/TaskItem";
@@ -35,7 +37,7 @@ interface Task {
 export default function Dashboard() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isLibraryOpen, setIsLibraryOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState(startOfToday());
@@ -133,7 +135,7 @@ export default function Dashboard() {
         await fetchTasks(user.id, selectedDate);
     };
 
-    const handleApplyRoutine = async (routine: any) => {
+    const handleApplyRoutine = async (routine: { name: string; routine_items?: any[] }) => {
         if (!user) return;
         setLoading(true);
 

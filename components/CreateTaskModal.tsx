@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Plus, Trash2, ChevronDown, Settings2, Sliders, Edit3, Check } from "lucide-react";
+import { X, Plus, Trash2, ChevronDown, Settings2, Edit3, Check } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 interface ExerciseItem {
@@ -23,7 +23,7 @@ interface ExerciseLibraryItem {
 interface CreateTaskModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSuccess: (task: any) => void;
+    onSuccess: (task: { id: string; title: string }) => void;
     userId: string;
     initialDate?: Date;
 }
@@ -167,7 +167,7 @@ export default function CreateTaskModal({ isOpen, onClose, onSuccess, userId, in
 
         // Save as template if requested
         if (saveAsTemplate) {
-            const { data: routine, error: routineError } = await supabase
+            const { data: routine } = await supabase
                 .from('routines')
                 .insert([{ user_id: userId, name: title }])
                 .select()
