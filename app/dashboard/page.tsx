@@ -247,9 +247,8 @@ export default function Dashboard() {
                                 <p className="text-[10px] text-neutral-400 font-black uppercase tracking-widest">
                                     {isSameDay(selectedDate, startOfToday()) ? 'Hoy' : format(selectedDate, "eeee", { locale: es })}
                                 </p>
-                                <p className="text-sm font-bold tracking-tight text-neutral-900 dark:text-white flex items-center gap-2">
+                                <p className="text-sm font-bold tracking-tight text-neutral-900 dark:text-white">
                                     {format(selectedDate, "d 'de' MMMM", { locale: es })}
-                                    <span className="text-[10px] text-blue-500 opacity-40 ml-1">v2.1</span>
                                 </p>
                             </div>
                         </div>
@@ -266,7 +265,7 @@ export default function Dashboard() {
                         <span className="text-blue-500">Sin límites.</span>
                     </h1>
 
-                    <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-6 px-6">
+                    <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar -mx-6 px-6 scroll-smooth">
                         {[...Array(14)].map((_, i) => {
                             const date = addDays(startOfToday(), i);
                             const isSelected = isSameDay(date, selectedDate);
@@ -274,15 +273,15 @@ export default function Dashboard() {
                                 <button
                                     key={i}
                                     onClick={() => setSelectedDate(date)}
-                                    className={`flex-shrink-0 w-12 h-12 rounded-2xl flex flex-col items-center justify-center transition-all tap-target ${isSelected
-                                        ? "bg-black dark:bg-white text-white dark:text-black shadow-xl scale-110"
-                                        : "bg-neutral-50 dark:bg-neutral-900 border border-neutral-100 dark:border-white/5 text-neutral-400"
+                                    className={`flex-shrink-0 w-[68px] h-[88px] rounded-[24px] flex flex-col items-center justify-center gap-1 transition-all tap-target ${isSelected
+                                        ? "bg-blue-600 text-white shadow-xl shadow-blue-500/30 scale-105"
+                                        : "bg-neutral-50 dark:bg-neutral-900 border border-neutral-100 dark:border-white/5 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                                         }`}
                                 >
-                                    <span className={`text-[8px] font-black uppercase tracking-tighter ${isSelected ? "opacity-60" : "text-neutral-500"}`}>
-                                        {format(date, "EEEEE", { locale: es })}
+                                    <span className={`text-[10px] font-black uppercase tracking-widest ${isSelected ? "text-white/60" : "text-neutral-500"}`}>
+                                        {format(date, "EEE", { locale: es }).replace('.', '')}
                                     </span>
-                                    <span className="text-sm font-black mt-0.5">{format(date, "d")}</span>
+                                    <span className="text-2xl font-black tracking-tighter">{format(date, "d")}</span>
                                 </button>
                             );
                         })}
@@ -409,7 +408,6 @@ export default function Dashboard() {
                     />
                 </>
             )}
-            <div className="text-[8px] opacity-10 text-center mt-12 pb-8 tracking-tighter uppercase font-black">Build v2.1-redesign</div>
         </div>
     );
 }
