@@ -32,6 +32,11 @@ export default function AuthPage() {
         setLoading(false);
     };
 
+    const handleDemoLogin = () => {
+        localStorage.setItem('demo_access', 'true');
+        router.push('/dashboard');
+    };
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen px-6 py-12">
             <motion.div
@@ -69,6 +74,14 @@ export default function AuthPage() {
                         className="tap-target w-full h-16 bg-black dark:bg-white text-white dark:text-black rounded-3xl font-bold text-lg shadow-xl shadow-black/10 dark:shadow-white/5 disabled:opacity-50"
                     >
                         {loading ? "Enviando..." : "Enviar Enlace"}
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={handleDemoLogin}
+                        className="w-full h-14 bg-neutral-100 dark:bg-neutral-900 text-neutral-500 rounded-3xl font-bold text-sm hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors border border-dashed border-neutral-300 dark:border-white/5"
+                    >
+                        Acceso para Pruebas (Sin Email)
                     </button>
                 </form>
 

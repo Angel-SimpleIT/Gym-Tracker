@@ -46,6 +46,19 @@ export default function Dashboard() {
 
     useEffect(() => {
         const checkUser = async () => {
+            // Check for demo bypass
+            const isDemo = localStorage.getItem('demo_access') === 'true';
+            if (isDemo) {
+                const mockUser = {
+                    id: 'demo-user-id',
+                    email: 'demo@gymtracker.com',
+                    user_metadata: { full_name: 'Usuario de Pruebas' }
+                } as any;
+                setUser(mockUser);
+                fetchTasks(mockUser.id, selectedDate);
+                return;
+            }
+
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
                 router.push('/auth');
@@ -55,7 +68,7 @@ export default function Dashboard() {
             }
         };
         checkUser();
-    }, [selectedDate]);
+    }, [selectedDate, router]);
 
     const fetchTasks = async (userId: string, date: Date) => {
         setLoading(true);
@@ -194,6 +207,7 @@ export default function Dashboard() {
     };
 
     const handleLogout = async () => {
+        localStorage.removeItem('demo_access');
         await supabase.auth.signOut();
         router.push('/auth');
     };
