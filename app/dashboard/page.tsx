@@ -3,14 +3,14 @@
 import { User } from "@supabase/supabase-js";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import TaskItem from "@/components/TaskItem";
 import CreateTaskModal from "@/components/CreateTaskModal";
-import { Calendar, Flame, Target, LogOut, Plus, BookOpen } from "lucide-react";
+import { Calendar, Flame, Target, LogOut, Plus, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import RoutineLibraryModal from "@/components/RoutineLibraryModal";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { format, addDays, startOfToday, isSameDay } from "date-fns";
+import { format, addDays, startOfToday, isSameDay, subDays } from "date-fns";
 import { es } from "date-fns/locale";
 
 interface Task {
@@ -42,6 +42,7 @@ export default function Dashboard() {
     const [isLibraryOpen, setIsLibraryOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState(startOfToday());
     const [focusedTaskId, setFocusedTaskId] = useState<string | null>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -265,26 +266,53 @@ export default function Dashboard() {
                         <span className="text-blue-500">Sin límites.</span>
                     </h1>
 
-                    <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar -mx-6 px-6 scroll-smooth">
-                        {[...Array(14)].map((_, i) => {
-                            const date = addDays(startOfToday(), i);
-                            const isSelected = isSameDay(date, selectedDate);
-                            return (
+                    <div className="relative group">
+                        <div className="flex items-center justify-between mb-2 px-1">
+                            <span className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">Seleccionar Fecha</span>
+                            <div className="flex gap-1">
                                 <button
-                                    key={i}
-                                    onClick={() => setSelectedDate(date)}
-                                    className={`flex-shrink-0 w-[68px] h-[88px] rounded-[24px] flex flex-col items-center justify-center gap-1 transition-all tap-target ${isSelected
-                                        ? "bg-blue-600 text-white shadow-xl shadow-blue-500/30 scale-105"
-                                        : "bg-neutral-50 dark:bg-neutral-900 border border-neutral-100 dark:border-white/5 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                                        }`}
+                                    onClick={() => {
+                                        if (scrollContainerRef.current) scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+                                    }}
+                                    className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center text-neutral-400 active:scale-95 transition-transform"
                                 >
-                                    <span className={`text-[10px] font-black uppercase tracking-widest ${isSelected ? "text-white/60" : "text-neutral-500"}`}>
-                                        {format(date, "EEE", { locale: es }).replace('.', '')}
-                                    </span>
-                                    <span className="text-2xl font-black tracking-tighter">{format(date, "d")}</span>
+                                    <ChevronLeft size={16} />
                                 </button>
-                            );
-                        })}
+                                <button
+                                    onClick={() => {
+                                        if (scrollContainerRef.current) scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+                                    }}
+                                    className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center text-neutral-400 active:scale-95 transition-transform"
+                                >
+                                    <ChevronRight size={16} />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div
+                            ref={scrollContainerRef}
+                            className="flex gap-3 overflow-x-auto pb-4 no-scrollbar -mx-6 px-6 scroll-smooth"
+                        >
+                            {[...Array(14)].map((_, i) => {
+                                const date = addDays(startOfToday(), i);
+                                const isSelected = isSameDay(date, selectedDate);
+                                return (
+                                    <button
+                                        key={i}
+                                        onClick={() => setSelectedDate(date)}
+                                        className={`flex-shrink-0 w-[68px] h-[88px] rounded-[24px] flex flex-col items-center justify-center gap-1 transition-all tap-target ${isSelected
+                                            ? "bg-blue-600 text-white shadow-xl shadow-blue-500/30"
+                                            : "bg-neutral-50 dark:bg-neutral-900 border border-neutral-100 dark:border-white/5 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                                            }`}
+                                    >
+                                        <span className={`text-[10px] font-black uppercase tracking-widest ${isSelected ? "text-white/60" : "text-neutral-500"}`}>
+                                            {format(date, "EEE", { locale: es }).replace('.', '')}
+                                        </span>
+                                        <span className="text-2xl font-black tracking-tighter">{format(date, "d")}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
                 </header>
 
