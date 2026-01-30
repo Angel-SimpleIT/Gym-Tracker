@@ -29,9 +29,11 @@ interface TaskItemProps {
     onToggle: (id: string, state: boolean) => void;
     onDelete: (id: string) => void;
     onDuplicate: () => void;
+    onFocus?: () => void;
+    isFocusMode?: boolean;
 }
 
-export default function TaskItem({ task, onToggle, onDelete, onDuplicate }: TaskItemProps) {
+export default function TaskItem({ task, onToggle, onDelete, onDuplicate, onFocus, isFocusMode }: TaskItemProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [items, setItems] = useState(task.task_items || []);
     const [isCompleted, setIsCompleted] = useState(task.is_completed);
@@ -88,9 +90,9 @@ export default function TaskItem({ task, onToggle, onDelete, onDuplicate }: Task
                 }`}
         >
             <div className="flex items-center p-5 cursor-pointer" onClick={() => hasItems && setIsExpanded(!isExpanded)}>
-                <div className={`w-12 h-12 rounded-2xl mr-4 flex items-center justify-center transition-colors ${isCompleted
+                <div className={`w-12 h-12 rounded-2xl mr-4 flex items-center justify-center transition-colors shadow-inner ${isCompleted
                     ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                    : "bg-blue-50 dark:bg-blue-500/10 text-blue-500"
+                    : "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
                     }`}>
                     <Dumbbell size={24} strokeWidth={2.5} />
                 </div>
@@ -114,6 +116,14 @@ export default function TaskItem({ task, onToggle, onDelete, onDuplicate }: Task
                 </div>
 
                 <div className="flex items-center gap-1">
+                    {onFocus && !isFocusMode && (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onFocus(); }}
+                            className="bg-black dark:bg-white text-white dark:text-black text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-lg mr-2 active:scale-95 transition-transform"
+                        >
+                            Iniciar
+                        </button>
+                    )}
                     <button
                         onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
                         className="p-2 text-neutral-300 hover:text-blue-500 transition-colors tap-target"
@@ -127,99 +137,102 @@ export default function TaskItem({ task, onToggle, onDelete, onDuplicate }: Task
                     >
                         <Trash2 size={16} />
                     </button>
-                    <div className="text-neutral-300 p-2">
-                        {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                    </div>
+                    {!isFocusMode && (
+                        <div className="text-neutral-300 p-2">
+                            {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        </div>
+                    )}
                 </div>
             </div>
 
-            <AnimatePresence>
-                {isExpanded && hasItems && (
+            <AnimatePresence initial={false}>
+                {(isExpanded || isFocusMode) && hasItems && (
                     <motion.div
-                        initial={{ height: 0, opacity: 0 }}
+                        initial={isFocusMode ? { opacity: 1 } : { height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="px-5 pb-6 overflow-hidden"
+                        className={`overflow-hidden ${isFocusMode ? "" : "px-5 pb-6"}`}
                     >
-                        <div className="space-y-4 pt-4 border-t border-neutral-50 dark:border-white/5">
+                        <div className={`space-y-6 ${isFocusMode ? "" : "pt-4 border-t border-neutral-50 dark:border-white/5"}`}>
                             {items.map((item) => (
                                 <div
                                     key={item.id}
-                                    className={`p-5 rounded-[2rem] border transition-all ${item.is_completed
+                                    className={`rounded-[2.5rem] border transition-all ${isFocusMode ? "p-6" : "p-5"} ${item.is_completed
                                         ? "bg-neutral-50 dark:bg-neutral-800/10 border-neutral-100 dark:border-white/5"
-                                        : "bg-neutral-50 dark:bg-neutral-800/20 border-neutral-100 dark:border-neutral-800/50"
+                                        : "bg-white dark:bg-neutral-900 border-neutral-100 dark:border-white/5 shadow-xl shadow-black/5"
                                         }`}
                                 >
-                                    <div className="flex justify-between items-start mb-4">
+                                    <div className="flex justify-between items-start mb-6">
                                         <div className="max-w-[70%]">
-                                            <h4 className={`text-base font-black tracking-tight font-outfit ${item.is_completed ? "text-neutral-400" : "text-neutral-900 dark:text-white"}`}>
+                                            <h4 className={`${isFocusMode ? "text-xl" : "text-base"} font-black tracking-tighter font-outfit ${item.is_completed ? "text-neutral-400" : "text-neutral-900 dark:text-white"}`}>
                                                 {item.title}
                                             </h4>
-                                            <div className="flex flex-wrap gap-1.5 mt-2">
-                                                <span className="flex items-center gap-1 text-[9px] font-black text-neutral-500 uppercase bg-white dark:bg-neutral-900 px-2 py-1 rounded-lg border border-neutral-100 dark:border-white/5">
-                                                    <Sliders size={10} className="text-blue-500" /> {item.series} SETS
+                                            <div className="flex flex-wrap gap-2 mt-3">
+                                                <span className="flex items-center gap-1.5 text-[10px] font-black text-neutral-500 uppercase bg-neutral-100 dark:bg-neutral-800/50 px-3 py-1.5 rounded-xl">
+                                                    <Sliders size={12} className="text-blue-500" /> {item.series} SERIES
                                                 </span>
-                                                <span className="flex items-center gap-1 text-[9px] font-black text-neutral-500 uppercase bg-white dark:bg-neutral-900 px-2 py-1 rounded-lg border border-neutral-100 dark:border-white/5">
-                                                    <TrendingUp size={10} className="text-orange-500" /> RIR {item.rir}
-                                                </span>
-                                                <span className="flex items-center gap-1 text-[9px] font-black text-blue-500 bg-blue-50 dark:bg-blue-500/10 px-2 py-1 rounded-lg border border-blue-100 dark:border-blue-500/10">
-                                                    {item.method}
+                                                <span className="flex items-center gap-1.5 text-[10px] font-black text-neutral-500 uppercase bg-neutral-100 dark:bg-neutral-800/50 px-3 py-1.5 rounded-xl">
+                                                    <TrendingUp size={12} className="text-orange-500" /> RIR {item.rir}
                                                 </span>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">Objetivo</p>
-                                            <p className="text-base font-black font-outfit text-blue-500">{item.prescribed_reps} REPS</p>
+                                            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1">Objetivo</p>
+                                            <p className={`${isFocusMode ? "text-2xl" : "text-lg"} font-black font-outfit text-blue-500`}>{item.prescribed_reps} REPS</p>
                                         </div>
                                     </div>
 
                                     {!item.is_completed ? (
-                                        <div className="grid grid-cols-3 gap-2 mt-4">
+                                        <div className="grid grid-cols-3 gap-3">
                                             <div className="space-y-1">
                                                 <input
                                                     type="number"
+                                                    inputMode="decimal"
                                                     placeholder="KG"
                                                     value={itemData[item.id]?.weight}
                                                     onChange={(e) => setItemData({
                                                         ...itemData,
                                                         [item.id]: { ...itemData[item.id], weight: e.target.value }
                                                     })}
-                                                    className="w-full h-12 bg-white dark:bg-neutral-900 rounded-xl text-center font-black text-base border border-neutral-100 dark:border-neutral-800 focus:border-blue-500 outline-none"
+                                                    className={`${isFocusMode ? "h-16 text-xl" : "h-12 text-base"} w-full bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl text-center font-black border-2 border-transparent focus:border-blue-500 outline-none transition-all`}
                                                 />
                                             </div>
                                             <div className="space-y-1">
                                                 <input
                                                     type="number"
+                                                    inputMode="numeric"
                                                     placeholder="REPS"
                                                     value={itemData[item.id]?.reps}
                                                     onChange={(e) => setItemData({
                                                         ...itemData,
                                                         [item.id]: { ...itemData[item.id], reps: e.target.value }
                                                     })}
-                                                    className="w-full h-12 bg-white dark:bg-neutral-900 rounded-xl text-center font-black text-base border border-neutral-100 dark:border-neutral-800 focus:border-blue-500 outline-none"
+                                                    className={`${isFocusMode ? "h-16 text-xl" : "h-12 text-base"} w-full bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl text-center font-black border-2 border-transparent focus:border-blue-500 outline-none transition-all`}
                                                 />
                                             </div>
                                             <button
                                                 onClick={() => saveItemProgress(item.id)}
                                                 disabled={!itemData[item.id]?.reps || !itemData[item.id]?.weight}
-                                                className="h-12 bg-black dark:bg-white text-white dark:text-black rounded-xl flex items-center justify-center tap-target disabled:opacity-20 transition-all shadow-sm"
+                                                className={`${isFocusMode ? "h-16" : "h-12"} bg-black dark:bg-white text-white dark:text-black rounded-2xl flex items-center justify-center tap-target disabled:opacity-20 transition-all shadow-lg active:scale-95`}
                                             >
-                                                <Check size={20} strokeWidth={3} />
+                                                <Check size={28} strokeWidth={4} />
                                             </button>
                                         </div>
                                     ) : (
-                                        <div className="mt-4 flex items-center justify-between p-3 bg-emerald-500/5 rounded-xl border border-emerald-500/10">
-                                            <div className="flex gap-6">
+                                        <div className="flex items-center justify-between p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
+                                            <div className="flex gap-8">
                                                 <div>
-                                                    <p className="text-[8px] font-black text-neutral-400 uppercase">Peso</p>
-                                                    <p className="font-black text-xs text-emerald-600 dark:text-emerald-400">{item.actual_weight} KG</p>
+                                                    <p className="text-[10px] font-black text-neutral-400 uppercase">Peso</p>
+                                                    <p className="text-xl font-black text-emerald-600 dark:text-emerald-400">{item.actual_weight} <span className="text-[10px]">KG</span></p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-[8px] font-black text-neutral-400 uppercase">Reps</p>
-                                                    <p className="font-black text-xs text-emerald-600 dark:text-emerald-400">{item.actual_reps} REPS</p>
+                                                    <p className="text-[10px] font-black text-neutral-400 uppercase">Reps</p>
+                                                    <p className="text-xl font-black text-emerald-600 dark:text-emerald-400">{item.actual_reps} <span className="text-[10px]">REPS</span></p>
                                                 </div>
                                             </div>
-                                            <Check size={14} className="text-emerald-500" strokeWidth={3} />
+                                            <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                                                <Check size={18} strokeWidth={4} />
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -227,13 +240,13 @@ export default function TaskItem({ task, onToggle, onDelete, onDuplicate }: Task
 
                             <button
                                 onClick={toggleMainTask}
-                                className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 mt-2 ${isCompleted
+                                className={`w-full ${isFocusMode ? "py-6" : "py-4"} rounded-3xl font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-3 mt-4 ${isCompleted
                                     ? "bg-neutral-100 dark:bg-neutral-800 text-neutral-400"
-                                    : "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                    : "bg-emerald-500 text-white shadow-2xl shadow-emerald-500/40"
                                     }`}
                             >
-                                {isCompleted ? "Sesión Completada" : "Finalizar Entrenamiento"}
-                                {isCompleted && <ShieldCheck size={16} />}
+                                {isCompleted ? "Sesión Finalizada" : "Finalizar Entrenamiento"}
+                                {isCompleted ? <ShieldCheck size={20} /> : <Check size={20} strokeWidth={3} />}
                             </button>
                         </div>
                     </motion.div>
