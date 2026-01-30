@@ -232,11 +232,14 @@ export default function Dashboard() {
         <div className="px-6 pt-10 pb-32 max-w-lg mx-auto min-h-screen relative overflow-x-hidden">
             {/* Main Header & Calendar - Hidden in Focus Mode */}
             <motion.div
+                key="dashboard-content"
+                initial={false}
                 animate={{
                     opacity: focusedTaskId ? 0 : 1,
-                    y: focusedTaskId ? -20 : 0,
+                    y: focusedTaskId ? -10 : 0,
                     pointerEvents: focusedTaskId ? 'none' : 'auto'
                 }}
+                transition={{ duration: 0.2 }}
             >
                 <header className="mb-10">
                     <div className="flex justify-between items-center mb-10">
@@ -300,7 +303,7 @@ export default function Dashboard() {
                                     <button
                                         key={i}
                                         onClick={() => setSelectedDate(date)}
-                                        className={`flex-shrink-0 w-[68px] h-[88px] rounded-[24px] flex flex-col items-center justify-center gap-1 transition-all tap-target ${isSelected
+                                        className={`flex-shrink-0 w-[68px] h-[88px] rounded-[24px] flex flex-col items-center justify-center gap-1 transition-colors tap-target ${isSelected
                                             ? "bg-blue-600 text-white shadow-xl shadow-blue-500/30"
                                             : "bg-neutral-50 dark:bg-neutral-900 border border-neutral-100 dark:border-white/5 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                                             }`}

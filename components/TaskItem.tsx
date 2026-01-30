@@ -81,7 +81,6 @@ export default function TaskItem({ task, onToggle, onDelete, onDuplicate, onFocu
 
     return (
         <motion.div
-            layout
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className={`relative mb-4 rounded-[2.5rem] border transition-all duration-300 overflow-hidden ${isCompleted
