@@ -395,6 +395,7 @@ export default function Dashboard() {
                     />
                 </>
             )}
+            <div className="text-[8px] opacity-10 text-center mt-12 pb-8 tracking-tighter uppercase font-black">Build v2.1-redesign</div>
         </div>
     );
 }
