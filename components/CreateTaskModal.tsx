@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Trash2, ChevronDown, Settings2, Edit3, Check } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -49,32 +49,33 @@ export default function CreateTaskModal({ isOpen, onClose, onSuccess, userId, in
 
     const [addedExercises, setAddedExercises] = useState<ExerciseItem[]>([]);
 
+    const fetchLibrary = useCallback(async () => {
+        const { data } = await supabase
+            .from('exercise_library')
+            .select('name, category')
+            .order('category', { ascending: true })
+            .order('name', { ascending: true });
+
+        if (data) {
+            const grouped = data.reduce((acc: Record<string, string[]>, curr: ExerciseLibraryItem) => {
+                const cat = curr.category || 'Otros';
+                if (!acc[cat]) acc[cat] = [];
+                acc[cat].push(curr.name);
+                return acc;
+            }, {});
+            setGroupedLibrary(grouped);
+        }
+    }, []);
+
     useEffect(() => {
         if (isOpen) {
-            const fetchLibrary = async () => {
-                const { data } = await supabase
-                    .from('exercise_library')
-                    .select('name, category')
-                    .order('category', { ascending: true })
-                    .order('name', { ascending: true });
-
-                if (data) {
-                    const grouped = data.reduce((acc: Record<string, string[]>, curr: ExerciseLibraryItem) => {
-                        const cat = curr.category || 'Otros';
-                        if (!acc[cat]) acc[cat] = [];
-                        acc[cat].push(curr.name);
-                        return acc;
-                    }, {});
-                    setGroupedLibrary(grouped);
-                }
-            };
             fetchLibrary();
             if (editingIndex === null) {
                 setTitle("");
                 setAddedExercises([]);
             }
         }
-    }, [isOpen]);
+    }, [isOpen, editingIndex, fetchLibrary]);
 
     const handleAddOrUpdateExercise = () => {
         if (!currentExercise.name) return;

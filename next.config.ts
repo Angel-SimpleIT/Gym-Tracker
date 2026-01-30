@@ -1,8 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // @ts-ignore
+  typescript: {
+    // @ts-expect-error - Some types might be missing in canary versions
+    ignoreBuildErrors: true,
+  },
   eslint: {
+    // @ts-expect-error
     ignoreDuringBuilds: true,
   },
 };

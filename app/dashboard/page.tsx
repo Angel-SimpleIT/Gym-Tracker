@@ -233,8 +233,9 @@ export default function Dashboard() {
                                 <p className="text-[10px] text-neutral-400 font-black uppercase tracking-widest">
                                     {isSameDay(selectedDate, startOfToday()) ? 'Hoy' : format(selectedDate, "eeee", { locale: es })}
                                 </p>
-                                <p className="text-sm font-bold tracking-tight text-neutral-900 dark:text-white">
+                                <p className="text-sm font-bold tracking-tight text-neutral-900 dark:text-white flex items-center gap-2">
                                     {format(selectedDate, "d 'de' MMMM", { locale: es })}
+                                    <span className="text-[10px] text-blue-500 opacity-40 ml-1">v2.1</span>
                                 </p>
                             </div>
                         </div>
@@ -248,7 +249,7 @@ export default function Dashboard() {
 
                     <h1 className="text-4xl font-black tracking-tighter mb-8 font-outfit text-neutral-900 dark:text-white leading-none">
                         Tu día.<br />
-                        <span className="text-neutral-400">Sin excusas.</span>
+                        <span className="text-blue-500">Sin límites.</span>
                     </h1>
 
                     <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-6 px-6">

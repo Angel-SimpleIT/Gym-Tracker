@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Play, Trash2, Copy, Plus, Edit3 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -39,7 +39,7 @@ export default function RoutineLibraryModal({ isOpen, onClose, userId, selectedD
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [templateToEdit, setTemplateToEdit] = useState<Routine | null>(null);
 
-    const fetchRoutines = async () => {
+    const fetchRoutines = useCallback(async () => {
         setLoading(true);
         const { data, error } = await supabase
             .from('routines')
@@ -50,13 +50,13 @@ export default function RoutineLibraryModal({ isOpen, onClose, userId, selectedD
             setRoutines(data);
         }
         setLoading(false);
-    };
+    }, []);
 
     useEffect(() => {
         if (isOpen) {
             fetchRoutines();
         }
-    }, [isOpen]);
+    }, [isOpen, fetchRoutines]);
 
     const handleDelete = async (id: string) => {
         const { error } = await supabase.from('routines').delete().eq('id', id);

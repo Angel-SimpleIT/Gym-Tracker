@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Trash2, ChevronDown, Settings2, Sliders, Edit3, Check } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -51,7 +51,7 @@ export default function CreateRoutineModal({ isOpen, onClose, onSuccess, userId,
         prescribed_reps: "10-12"
     });
 
-    const fetchLibrary = async () => {
+    const fetchLibrary = useCallback(async () => {
         const { data } = await supabase.from('exercise_library').select('name, category').order('category');
         if (data) {
             const grouped = data.reduce((acc: Record<string, string[]>, curr: { name: string; category: string }) => {
@@ -62,7 +62,7 @@ export default function CreateRoutineModal({ isOpen, onClose, onSuccess, userId,
             }, {});
             setGroupedLibrary(grouped);
         }
-    };
+    }, []);
 
     useEffect(() => {
         if (isOpen) {
@@ -82,7 +82,7 @@ export default function CreateRoutineModal({ isOpen, onClose, onSuccess, userId,
                 setAddedExercises([]);
             }
         }
-    }, [isOpen, routineToEdit]);
+    }, [isOpen, routineToEdit, fetchLibrary]);
 
     const handleAddOrUpdateExercise = () => {
         if (!currentExercise.name) return;
